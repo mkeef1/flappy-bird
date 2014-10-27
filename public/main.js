@@ -6,6 +6,7 @@ var mainState = {
     //game.load.image('bird', 'assets/bird.png');
     game.load.image('pipe', 'assets/pipe.png');
     game.load.spritesheet('bird', 'assets/megaman.png', 93.5, 144);
+    game.load.audio('jump', 'assets/jump.wav');
 
   },
 
@@ -25,6 +26,8 @@ var mainState = {
     this.timer = game.time.events.loop(1500, this.addRowOfPipes, this);
     this.score = 0;
     this.labelScore = game.add.text(20, 20, "0", {font: "30px Arial", fill: "#ffffff"});
+    this.bird.anchor.setTo(-0.2, 0.5);
+    this.jumpSound = game.add.audio('jump');
 
   },
 
@@ -47,13 +50,31 @@ var mainState = {
 
   update: function(){
     if(this.bird.inWorld === false)
-      this.resartGame();
+      this.hitPipe();
     game.physics.arcade.overlap(this.bird, this.pipes, this.resartGame, null, this);
+    if(this.bird.angle < 20)
+      this.bird.angle += 1;
+  },
+
+  hitPipe: function(){
+    if(this.bird.alive === false)
+      return;
+    this.bird.alive = false;
+    game.time.events.remove(this.timer);
+    this.pipes.forEachAlive(function(p){
+      p.body.velocity.x = 0;
+    }, this);
   },
 
   jump: function(){
+    if(this.bird.alive === false)
+      return;
     this.bird.body.velocity.y = -300;
     this.bird.animations.play('jump');
+    var animation = game.add.tween(this.bird);
+    animation.to({angle: -20}, 100);
+    animation.start();
+    this.jumpSound.play();
   },
 
   resartGame: function(){
