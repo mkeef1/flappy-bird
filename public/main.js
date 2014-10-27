@@ -3,15 +3,19 @@ var game = new Phaser.Game(800, 490, Phaser.AUTO, 'flappy-bird');
 var mainState = {
   preload: function(){
     game.stage.backgroundColor = '#71c5cf';
-    game.load.image('bird', 'assets/bird.png');
+    //game.load.image('bird', 'assets/bird.png');
     game.load.image('pipe', 'assets/pipe.png');
+    game.load.spritesheet('bird', 'assets/megaman.png', 93.5, 144);
+
   },
 
 
   create: function(){
     game.physics.startSystem(Phaser.Physics.ARCADE);
     this.bird = this.game.add.sprite(100, 245, 'bird');
+    this.bird.scale.setTo(0.4, 0.4);
     game.physics.arcade.enable(this.bird);
+    this.bird.animations.add('jump', [1, 2, 3, 4], 20, false);
     this.bird.body.gravity.y = 1000;
     var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     spaceKey.onDown.add(this.jump, this);
@@ -33,7 +37,7 @@ var mainState = {
   },
 
   addRowOfPipes: function(){
-    var hole = Math.floor(Math.random() * 5) + 1;
+    var hole = Math.floor(Math.random() * 5) + 2;
     for(var i = 0; i < 8; i++)
       if(i != hole && i != hole + 1)
         this.addOnePipe(800, i * 60 + 10);
@@ -48,7 +52,8 @@ var mainState = {
   },
 
   jump: function(){
-    this.bird.body.velocity.y = -350;
+    this.bird.body.velocity.y = -300;
+    this.bird.animations.play('jump');
   },
 
   resartGame: function(){
